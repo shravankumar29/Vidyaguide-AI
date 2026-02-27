@@ -1,0 +1,279 @@
+print("APP STARTED")
+
+import gradio as gr
+import PyPDF2
+from transformers import pipeline
+
+# -------------------------------
+# LOAD MODEL
+# -------------------------------
+generator = pipeline("text-generation", model="distilgpt2")
+
+# -------------------------------
+# TEXT EXTRACTION
+# -------------------------------
+def extract_text(file):
+    try:
+        file_path = file.name if hasattr(file, "name") else file
+        reader = PyPDF2.PdfReader(file_path)
+
+        text = ""
+        for page in reader.pages:
+            content = page.extract_text()
+            if content:
+                text += content
+
+        return text.strip()
+    except:
+        return ""
+
+# -------------------------------
+# CLEAN DUPLICATES
+# -------------------------------
+def clean_list(text):
+    items = [i.strip() for i in text.split(",")]
+    unique = list(dict.fromkeys([i for i in items if i]))
+    return ", ".join(unique)
+
+# -------------------------------
+# ROADMAP GENERATION (IMPROVED)
+# -------------------------------
+def generate_roadmap(missing_skills):
+
+    # 🔥 fallback if missing empty
+    if not missing_skills:
+        missing_skills = "Python, Data Structures, Cloud Computing"
+
+    prompt = f"""
+List 3 useful courses and a simple roadmap.
+
+Missing Skills: {missing_skills}
+
+Output format:
+Courses: Course1, Course2, Course3
+Roadmap: Step1 -> Step2 -> Step3
+"""
+
+    result = generator(
+        prompt,
+        max_length=120,
+        truncation=True,
+        repetition_penalty=1.5
+    )[0]["generated_text"]
+
+    courses = ""
+    roadmap = ""
+
+    try:
+        parts = result.split("Roadmap:")
+        courses = parts[0].replace("Courses:", "").strip()
+        roadmap = parts[1].strip()
+    except:
+        courses = result
+
+    # 🔥 fallback if model fails
+    if not courses:
+        courses = "Python Course, DSA Course, Cloud Course"
+
+    if not roadmap:
+        roadmap = "Step1 Learn basics -> Step2 Build projects -> Step3 Apply for jobs"
+
+    return courses, roadmap
+
+# -------------------------------
+# AI ANALYSIS
+# -------------------------------
+def analyze_resume(file):
+    if file is None:
+        return "", "", 0, "", "", "", ""
+
+    text = extract_text(file)
+
+    if not text:
+        return "No readable text", "", 0, "", "", "", ""
+
+    prompt = f"""
+Extract ONLY:
+
+Skills: Python, Java
+Missing Skills: Cloud, DevOps
+Score: 75
+Suggestions: Improve projects
+Career Roles: Software Engineer
+
+Resume:
+{text[:800]}
+"""
+
+    try:
+        result = generator(
+            prompt,
+            max_length=180,
+            truncation=True,
+            repetition_penalty=1.5
+        )[0]["generated_text"]
+
+        if "Resume:" in result:
+            result = result.split("Resume:")[0]
+
+        skills = ""
+        missing = ""
+        score = 70
+        suggestions = ""
+        roles = ""
+
+        for line in result.split("\n"):
+            if "Skills:" in line:
+                skills = line.split("Skills:")[-1].strip()
+            elif "Missing Skills:" in line:
+                missing = line.split("Missing Skills:")[-1].strip()
+            elif "Score:" in line:
+                digits = ''.join(filter(str.isdigit, line))
+                if digits:
+                    score = int(digits)
+            elif "Suggestions:" in line:
+                suggestions = line.split("Suggestions:")[-1].strip()
+            elif "Career Roles:" in line:
+                roles = line.split("Career Roles:")[-1].strip()
+
+        # 🔥 fallback if missing empty
+        if not missing:
+            missing = "Cloud Computing, Data Structures"
+
+        skills = clean_list(skills)
+        missing = clean_list(missing)
+        roles = clean_list(roles)
+
+        courses, roadmap = generate_roadmap(missing)
+
+        return skills, missing, score, suggestions, roles, courses, roadmap
+
+    except Exception as e:
+        return f"Error: {str(e)}", "", 0, "", "", "", ""
+
+def generate_questions(role):
+
+    if not role:
+        role = "Software Engineer"
+
+    prompt = f"""
+Generate 3 interview questions for {role}.
+
+Format:
+Q1:
+Q2:
+Q3:
+"""
+
+    result = generator(
+        prompt,
+        max_length=100,
+        truncation=True,
+        repetition_penalty=1.5
+    )[0]["generated_text"]
+
+    return result
+
+def evaluate_answer(role, answer):
+
+    prompt = f"""
+Evaluate this answer for {role}.
+
+Answer:
+{answer}
+
+Give:
+Score: (out of 10)
+Feedback:
+"""
+
+    result = generator(
+        prompt,
+        max_length=120,
+        truncation=True,
+        repetition_penalty=1.5
+    )[0]["generated_text"]
+
+    score = 7
+    feedback = result
+
+    try:
+        for line in result.split("\n"):
+            if "Score:" in line:
+                digits = ''.join(filter(str.isdigit, line))
+                if digits:
+                    score = int(digits)
+    except:
+        pass
+
+    return score, feedback
+# -------------------------------
+# UI
+# -------------------------------
+with gr.Blocks(theme=gr.themes.Soft()) as app:
+
+    gr.Markdown("# 🚀 VidyaMitra AI Career Agent")
+    gr.Markdown("### Smart Resume Analyzer + Career Guidance System")
+
+    with gr.Row():
+        file_input = gr.File(label="📄 Upload Resume")
+        analyze_btn = gr.Button("🔍 Analyze Resume")
+
+    gr.Markdown("## 📊 Resume Insights Dashboard")
+
+    with gr.Row():
+        skills_box = gr.Textbox(label="✅ Skills")
+        missing_box = gr.Textbox(label="❌ Missing Skills")
+
+    score_slider = gr.Slider(0, 100, label="📊 Score")
+
+    with gr.Row():
+        suggestion_box = gr.Textbox(label="💡 Suggestions")
+        role_box = gr.Textbox(label="🎯 Roles")
+
+    gr.Markdown("## 📚 Learning & Career Roadmap")
+
+    with gr.Row():
+        course_box = gr.Textbox(label="📚 Courses", lines=6)
+        roadmap_box = gr.Textbox(label="🗺️ Roadmap", lines=6)
+    gr.Markdown("## 🎤 AI Mock Interview")
+
+    with gr.Row():
+        role_input = gr.Textbox(label="Enter Job Role")
+        gen_btn = gr.Button("Generate Questions")
+
+    question_box = gr.Textbox(label="Interview Questions", lines=6)
+
+    gen_btn.click(generate_questions, inputs=role_input, outputs=question_box)
+
+    with gr.Row():
+        answer_input = gr.Textbox(label="Your Answer", lines=4)
+        eval_btn = gr.Button("Evaluate Answer")
+
+    feedback_box = gr.Textbox(label="AI Feedback", lines=6)
+    score_box = gr.Slider(0, 10, label="Interview Score")
+
+    eval_btn.click(
+    evaluate_answer,
+    inputs=[role_input, answer_input],
+    outputs=[score_box, feedback_box])
+    
+    analyze_btn.click(
+        analyze_resume,
+        inputs=file_input,
+        outputs=[
+            skills_box,
+            missing_box,
+            score_slider,
+            suggestion_box,
+            role_box,
+            course_box,
+            roadmap_box
+        ]
+    )
+
+# -------------------------------
+# RUN
+# -------------------------------
+if __name__ == "__main__":
+    app.launch(inbrowser=True, share=True)
