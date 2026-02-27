@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+python-dotenv
+supabase
+openai
+PyJWT
+passlib
+bcrypt
+python-multipart
+httpx
+google-api-python-client
+email-validator
