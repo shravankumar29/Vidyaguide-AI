@@ -1,16 +1,62 @@
-# React + Vite
+# VidyaMitra - Intelligent Career Agent 🚀
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+VidyaMitra is a modern, AI-powered monolithic application designed to help job seekers optimize their career paths. It combines an intelligent backend with a premium, glassmorphic frontend to provide resume analysis, skill gap detection, career roadmaps, and interactive AI-driven quizzes.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **AI Resume Analyzer**: Upload a PDF or paste text to get an instant overall score, strength analysis, and keyword density check.
+- **Dynamic Skill Gap Analysis**: Enter a target role and your current skills to see exactly what you're missing.
+- **AI Career Roadmap**: Generate a 3-5 year progression plan with estimated timelines and recommended certifications.
+- **Adaptive Training Quizzes**: Generate specific quizzes on any topic (React, Python, etc.) to test your knowledge with instant AI feedback.
+- **Skills Radar Chart**: Visual breakdown of your proficiency vs. market requirements.
+- **Monolithic Architecture**: Unified Python backend (FastAPI) that serves the React frontend builder for zero-overhead deployment.
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Backend**: Python 3.10+, [FastAPI](https://fastapi.tiangolo.com/)
+- **Frontend**: React (Vite), Tailwind CSS, Framer Motion
+- **AI**: Google Gemini Pro 2.5 (Generative AI)
+- **Database**: Supabase (PostgreSQL)
+- **Charts**: Recharts
+- **Icons**: Lucide React
 
-## Expanding the ESLint configuration
+## 🚀 Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+
+- Python installed
+- Node.js (only for modifying frontend)
+
+### Installation
+
+1. **Clone the repository**
+2. **Setup Virtual Environment**
+   ```bash
+   python -m venv venv
+   .\venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
+### 3. Configure Environment Variables (For Judges/Evaluators)
+Because we prioritize security, API keys are not committed to the repository. 
+
+1. Duplicate the `.env.example` file and rename it to `.env`.
+2. Open `.env` and insert a valid **Google Gemini API Key**:
+   ```env
+   # AI (Gemini)
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
+   *(Note: The application's AI features will not function without a valid Gemini key)*
+
+## 🏃 Running the Application
+
+You only need one command to run everything!
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Then visit: **[http://localhost:8000](http://localhost:8000)**
+
+---
+
+**Note**: The project is designed as a **Monolith**. The React frontend code in `src/` has already been built into the `dist/` folder, which the Python server serves automatically. If you edit the JavaScript files, you will need to run `npm run build` again to see changes.

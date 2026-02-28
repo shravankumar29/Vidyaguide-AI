@@ -158,11 +158,24 @@ router_auth = APIRouter(
     tags=["Authentication"]
 )
 
+# In-memory mock database for local testing when Supabase is disconnected
+mock_users_db = {}
+
+
 @router_auth.post("/register", response_model=UserResponse)
 async def register(user: UserCreate):
     if not supabase:
         import uuid
         import datetime
+        
+        if user.email in mock_users_db:
+            raise HTTPException(status_code=400, detail="User already exists")
+            
+        mock_users_db[user.email] = {
+            "password": user.password,
+            "name": user.name or "Mock User",
+        }
+        
         return UserResponse(
             id=str(uuid.uuid4()),
             email=user.email,
@@ -197,6 +210,12 @@ async def register(user: UserCreate):
 @router_auth.post("/login", response_model=Token)
 async def login(user: UserLogin):
     if not supabase:
+        if user.email not in mock_users_db:
+            raise HTTPException(status_code=401, detail="Invalid credentials. Have you registered?")
+            
+        if mock_users_db[user.email]["password"] != user.password:
+            raise HTTPException(status_code=401, detail="Invalid credentials. Incorrect password.")
+            
         return Token(
             access_token="mock_jwt_token_for_local_testing",
             token_type="bearer"
@@ -484,32 +503,27 @@ async def analyze_resume(request: ResumeAnalysisRequest, token: str = Depends(ve
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI Analysis failed: {str(e)}")
 
-@router_resume.post("/analyze-pdf", response_model=ResumeAnalysisResponse)
-async def analyze_resume_pdf(
+@router_resume.post("/analyze-file", response_model=ResumeAnalysisResponse)
+async def analyze_resume_file(
     file: UploadFile = File(...),
     token: str = Depends(verify_token)
 ):
     """
-    Reads a PDF, extracts text, and sends it to the AI for analysis.
+    Reads a file (PDF or Image), and sends its payload to the AI for analysis.
     """
     try:
-        if not file.filename.endswith(".pdf"):
-            raise HTTPException(status_code=400, detail="Only PDF files are currently supported for direct extraction.")
+        filename = file.filename.lower()
+        if not (filename.endswith(".pdf") or filename.endswith(".png") or filename.endswith(".jpg") or filename.endswith(".jpeg")):
+            raise HTTPException(status_code=400, detail="Only PDF, PNG, JPG, and JPEG files are currently supported.")
             
         file_bytes = await file.read()
-        pdf_reader = PyPDF2.PdfReader(io.BytesIO(file_bytes))
+        mime_type = file.content_type
         
-        extracted_text = ""
-        for page in pdf_reader.pages:
-            extracted_text += page.extract_text() + "\n"
-            
-        if not extracted_text.strip():
-            raise HTTPException(status_code=400, detail="Could not extract text from the PDF. It may be an image-only PDF.")
-            
-        analysis = await analyze_resume_with_ai(extracted_text)
+        # We pass the raw file bytes directly to the AI service
+        analysis = await analyze_resume_with_ai(file_data=file_bytes, mime_type=mime_type)
         return ResumeAnalysisResponse(**analysis)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"PDF Analysis failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"File Analysis failed: {str(e)}")
 
 
 

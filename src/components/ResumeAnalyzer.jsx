@@ -24,7 +24,7 @@ export default function ResumeAnalyzer() {
             if (file) {
                 const formData = new FormData();
                 formData.append('file', file);
-                res = await api.post('/resume/analyze-pdf', formData, {
+                res = await api.post('/resume/analyze-file', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
             } else {
@@ -60,15 +60,15 @@ export default function ResumeAnalyzer() {
 
                 <form onSubmit={handleAnalyze} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">Upload Resume (PDF)</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Upload Resume (PDF or Image)</label>
                         <div className="flex items-center justify-center w-full mb-4">
                             <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition">
                                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                     <Upload className="w-8 h-8 mb-3 text-slate-400" />
                                     <p className="mb-2 text-sm text-slate-500"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                                    <p className="text-xs text-slate-500">{file ? file.name : "PDF (MAX. 5MB)"}</p>
+                                    <p className="text-xs text-slate-500">{file ? file.name : "PDF, PNG, JPG (MAX. 5MB)"}</p>
                                 </div>
-                                <input id="dropzone-file" type="file" className="hidden" accept=".pdf" onChange={(e) => { setFile(e.target.files[0]); setResumeText(''); }} />
+                                <input id="dropzone-file" type="file" className="hidden" accept=".pdf,.png,.jpg,.jpeg" onChange={(e) => { setFile(e.target.files[0]); setResumeText(''); }} />
                             </label>
                         </div>
                     </div>

@@ -19,9 +19,17 @@ export default function Register() {
 
         try {
             const res = await api.post('/auth/register', { email, password, name });
-            // If registration succeeds, we might need to log them in directly or redirect to login.
-            // Usually an auto-login relies on backend returning a token. Our backend returns user info.
-            // For now, redirect to login page with a success message state.
+
+            // Seed the profile so the user sees their own info immediately when they do log in
+            const defaultProfile = {
+                name: name || 'VidyaMitra User',
+                email: email,
+                role: 'Job Seeker',
+                phone: 'Add your phone number',
+                location: 'Add your location'
+            };
+            localStorage.setItem('vidyamitra_user_profile', JSON.stringify(defaultProfile));
+
             navigate('/login', { state: { message: "Registration successful. Please log in." } });
         } catch (err) {
             setError(err.response?.data?.detail || 'Failed to register');
