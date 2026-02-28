@@ -19,7 +19,6 @@ export default function Login() {
         try {
             const res = await api.post('/auth/login', { email, password });
             setAuthToken(res.data.access_token);
-
             // Try to load any existing profile
             let storedProfileStr = localStorage.getItem('vidyamitra_user_profile');
             let storedProfile = storedProfileStr ? JSON.parse(storedProfileStr) : null;
@@ -37,7 +36,6 @@ export default function Login() {
             // Force the email to match the login credentials as source of truth
             storedProfile.email = email;
             localStorage.setItem('vidyamitra_user_profile', JSON.stringify(storedProfile));
-
             navigate('/dashboard');
         } catch (err) {
             setError(err.response?.data?.detail || 'Failed to login');

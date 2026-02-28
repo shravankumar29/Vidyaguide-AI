@@ -158,15 +158,19 @@ router_auth = APIRouter(
     tags=["Authentication"]
 )
 
+<<<<<<< HEAD
 # In-memory mock database for local testing when Supabase is disconnected
 mock_users_db = {}
 
 
+=======
+>>>>>>> 34a1d81faa0820f45de81452b3726452e9f4c534
 @router_auth.post("/register", response_model=UserResponse)
 async def register(user: UserCreate):
     if not supabase:
         import uuid
         import datetime
+<<<<<<< HEAD
         
         if user.email in mock_users_db:
             raise HTTPException(status_code=400, detail="User already exists")
@@ -176,6 +180,8 @@ async def register(user: UserCreate):
             "name": user.name or "Mock User",
         }
         
+=======
+>>>>>>> 34a1d81faa0820f45de81452b3726452e9f4c534
         return UserResponse(
             id=str(uuid.uuid4()),
             email=user.email,
@@ -210,12 +216,15 @@ async def register(user: UserCreate):
 @router_auth.post("/login", response_model=Token)
 async def login(user: UserLogin):
     if not supabase:
+<<<<<<< HEAD
         if user.email not in mock_users_db:
             raise HTTPException(status_code=401, detail="Invalid credentials. Have you registered?")
             
         if mock_users_db[user.email]["password"] != user.password:
             raise HTTPException(status_code=401, detail="Invalid credentials. Incorrect password.")
             
+=======
+>>>>>>> 34a1d81faa0820f45de81452b3726452e9f4c534
         return Token(
             access_token="mock_jwt_token_for_local_testing",
             token_type="bearer"
@@ -503,12 +512,18 @@ async def analyze_resume(request: ResumeAnalysisRequest, token: str = Depends(ve
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI Analysis failed: {str(e)}")
 
+<<<<<<< HEAD
 @router_resume.post("/analyze-file", response_model=ResumeAnalysisResponse)
 async def analyze_resume_file(
+=======
+@router_resume.post("/analyze-pdf", response_model=ResumeAnalysisResponse)
+async def analyze_resume_pdf(
+>>>>>>> 34a1d81faa0820f45de81452b3726452e9f4c534
     file: UploadFile = File(...),
     token: str = Depends(verify_token)
 ):
     """
+<<<<<<< HEAD
     Reads a file (PDF or Image), and sends its payload to the AI for analysis.
     """
     try:
@@ -524,6 +539,28 @@ async def analyze_resume_file(
         return ResumeAnalysisResponse(**analysis)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"File Analysis failed: {str(e)}")
+=======
+    Reads a PDF, extracts text, and sends it to the AI for analysis.
+    """
+    try:
+        if not file.filename.endswith(".pdf"):
+            raise HTTPException(status_code=400, detail="Only PDF files are currently supported for direct extraction.")
+            
+        file_bytes = await file.read()
+        pdf_reader = PyPDF2.PdfReader(io.BytesIO(file_bytes))
+        
+        extracted_text = ""
+        for page in pdf_reader.pages:
+            extracted_text += page.extract_text() + "\n"
+            
+        if not extracted_text.strip():
+            raise HTTPException(status_code=400, detail="Could not extract text from the PDF. It may be an image-only PDF.")
+            
+        analysis = await analyze_resume_with_ai(extracted_text)
+        return ResumeAnalysisResponse(**analysis)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"PDF Analysis failed: {str(e)}")
+>>>>>>> 34a1d81faa0820f45de81452b3726452e9f4c534
 
 
 

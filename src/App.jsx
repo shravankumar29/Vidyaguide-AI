@@ -1,11 +1,15 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+<<<<<<< HEAD
 import { FileText, Target, Map, BrainCircuit, BarChart } from 'lucide-react';
+=======
+>>>>>>> 34a1d81faa0820f45de81452b3726452e9f4c534
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 
+<<<<<<< HEAD
 const Home = () => (
   <div className="flex flex-col items-center w-full">
     {/* Hero Section */}
@@ -66,6 +70,18 @@ const Home = () => (
       </div>
     </div>
   </div>
+=======
+// Basic Placeholder Pages
+const Home = () => (
+  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-8 text-center mt-20">
+    <h1 className="text-5xl font-extrabold text-gradient mb-4">Welcome to VidyaMitra</h1>
+    <p className="text-xl text-slate-600 max-w-2xl mx-auto">Your Intelligent Career Agent. Elevate your professional journey with AI-driven insights, resume analysis, and tailored mock interviews.</p>
+    <div className="mt-8 flex justify-center gap-4">
+      <Link to="/login" className="px-6 py-3 bg-primary-600 text-white rounded-full font-semibold shadow-lg hover:bg-primary-700 transition">Get Started</Link>
+      <Link to="/features" className="px-6 py-3 bg-white text-slate-800 rounded-full font-semibold shadow border hover:bg-slate-50 transition">Explore Features</Link>
+    </div>
+  </motion.div>
+>>>>>>> 34a1d81faa0820f45de81452b3726452e9f4c534
 );
 
 const App = () => {
@@ -82,6 +98,10 @@ const App = () => {
             Vidya<span className="text-primary-600">Mitra</span>
           </Link>
           <div className="flex gap-6 items-center">
+<<<<<<< HEAD
+=======
+            <Link to="/features" className="text-slate-600 hover:text-primary-600 font-medium transition">Features</Link>
+>>>>>>> 34a1d81faa0820f45de81452b3726452e9f4c534
             <Link to="/login" className="text-slate-600 hover:text-primary-600 font-medium transition">Login</Link>
             <Link to="/register" className="px-4 py-2 bg-slate-900 text-white rounded-full hover:bg-slate-800 transition font-medium">Sign Up</Link>
           </div>

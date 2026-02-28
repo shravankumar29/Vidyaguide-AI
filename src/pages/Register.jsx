@@ -19,7 +19,6 @@ export default function Register() {
 
         try {
             const res = await api.post('/auth/register', { email, password, name });
-
             // Seed the profile so the user sees their own info immediately when they do log in
             const defaultProfile = {
                 name: name || 'VidyaMitra User',
@@ -29,7 +28,6 @@ export default function Register() {
                 location: 'Add your location'
             };
             localStorage.setItem('vidyamitra_user_profile', JSON.stringify(defaultProfile));
-
             navigate('/login', { state: { message: "Registration successful. Please log in." } });
         } catch (err) {
             setError(err.response?.data?.detail || 'Failed to register');

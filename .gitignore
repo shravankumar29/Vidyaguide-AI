@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 
+<<<<<<< HEAD
 # Environment Variables & Secrets
 .env
 .env.*
@@ -27,6 +28,8 @@ env/
 .pytest_cache/
 ai_error_log.txt
 
+=======
+>>>>>>> 34a1d81faa0820f45de81452b3726452e9f4c534
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
