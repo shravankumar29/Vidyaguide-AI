@@ -18,15 +18,9 @@ def clean_json_response(text: str) -> str:
         text = text[:-3]
     return text.strip()
 
-<<<<<<< HEAD
 async def generate_ai_response(prompt: str, system_instruction: str = None, mock_response: dict = None, file_data: bytes = None, mime_type: str = None) -> dict:
     """
     Centralized function to call Gemini AI. Allows for multimodal payloads (files).
-=======
-async def generate_ai_response(prompt: str, system_instruction: str = None, mock_response: dict = None) -> dict:
-    """
-    Centralized function to call Gemini AI.
->>>>>>> 34a1d81faa0820f45de81452b3726452e9f4c534
     Falls back to mock_response if no API key is set.
     """
     # Try fetching the GEMINI_API_KEY dynamically just in case it was added
@@ -49,7 +43,6 @@ async def generate_ai_response(prompt: str, system_instruction: str = None, mock
     try:
         # Prompting it strictly for JSON
         full_prompt = prompt + "\n\nRETURN STRICTLY VALID JSON ONLY WITHOUT MARKDOWN FORMATTING."
-<<<<<<< HEAD
         
         contents = []
         if file_data and mime_type:
@@ -57,9 +50,6 @@ async def generate_ai_response(prompt: str, system_instruction: str = None, mock
         contents.append(full_prompt)
         
         response = model.generate_content(contents)
-=======
-        response = model.generate_content(full_prompt)
->>>>>>> 34a1d81faa0820f45de81452b3726452e9f4c534
         
         cleaned_text = clean_json_response(response.text)
         return json.loads(cleaned_text)
