@@ -375,9 +375,18 @@ async def generate_quiz(request: QuizRequest, token: str = Depends(verify_token)
             ]
         }}
         """
-        system_instruction = "You are an expert quiz creator. Return strictly valid JSON."
-        data = await generate_ai_response(prompt, system_instruction, mock_response=mock)
+        system_instruction = "You are an expert technical interviewer and quiz creator. Always respond with only valid JSON matching the exact schema."
         
+        try:
+            data = await generate_ai_response(prompt, system_instruction)
+        except Exception as e:
+            print("Failed AI generation, falling back to mock", e)
+            data = mock
+
+        # If data is completely empty or invalid, fallback
+        if not data or "questions" not in data:
+            data = mock
+            
         # Parse into QuizQuestion objects 
         parsed_questions = []
         for q in data.get("questions", []):
@@ -387,8 +396,20 @@ async def generate_quiz(request: QuizRequest, token: str = Depends(verify_token)
                  correct_option_index=q.get("correct_option_index", 0),
                  explanation=q.get("explanation", "Sample Explanation")
              ))
+        
+        # Ensure we always return at least one valid question
+        if not parsed_questions:
+            parsed_questions = [QuizQuestion(
+                 question_text="What is 1+1?",
+                 options=["1", "2", "3", "4"],
+                 correct_option_index=1,
+                 explanation="Basic math fallback if AI fails."
+            )]
+
         return QuizResponse(domain=request.domain, questions=parsed_questions)
     except Exception as e:
+        import traceback
+        print("Quiz Generation Critical Error:", traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
 
 

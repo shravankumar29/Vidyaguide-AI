@@ -37,19 +37,17 @@ async def generate_ai_response(prompt: str, system_instruction: str = None, mock
 
     genai.configure(api_key=gemini_key)
     # Using gemini-2.5-flash which is fast and supports JSON instructions well
-    model = genai.GenerativeModel('gemini-2.5-flash', 
-                                  system_instruction=system_instruction)
+    model = genai.GenerativeModel('gemini-2.5-flash')
     
     try:
         # Prompting it strictly for JSON
-        full_prompt = prompt + "\n\nRETURN STRICTLY VALID JSON ONLY WITHOUT MARKDOWN FORMATTING."
+        full_prompt = (system_instruction + "\n\n" if system_instruction else "") + prompt + "\n\nRETURN STRICTLY VALID JSON ONLY WITHOUT MARKDOWN FORMATTING."
         
-        contents = []
         if file_data and mime_type:
-            contents.append({"mime_type": mime_type, "data": file_data})
-        contents.append(full_prompt)
-        
-        response = model.generate_content(contents)
+            contents = [{"mime_type": mime_type, "data": file_data}, full_prompt]
+            response = model.generate_content(contents)
+        else:
+            response = model.generate_content(full_prompt)
         
         cleaned_text = clean_json_response(response.text)
         return json.loads(cleaned_text)
