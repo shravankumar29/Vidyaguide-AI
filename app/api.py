@@ -202,7 +202,7 @@ async def register(user: UserCreate):
             id=user_data.id,
             email=user_data.email,
             name=user_data.user_metadata.get("name") if user_data.user_metadata else user.name,
-            created_at=user_data.created_at
+            created_at=str(user_data.created_at) if user_data.created_at else ""
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
