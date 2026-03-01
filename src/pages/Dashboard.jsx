@@ -10,7 +10,9 @@ import {
     Video,
     LogOut,
     BookOpen,
-    User
+    User,
+    Menu,
+    X
 } from 'lucide-react';
 
 import ResumeAnalyzer from '../components/ResumeAnalyzer';
@@ -24,6 +26,7 @@ export default function Dashboard() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('overview');
     const [progressStats, setProgressStats] = useState({ resumeScore: '--', lastQuizScore: '--' });
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     useEffect(() => {
         if (activeTab === 'overview') {
@@ -57,12 +60,20 @@ export default function Dashboard() {
     ];
 
     return (
-        <div className="min-h-screen bg-slate-50 flex">
+        <div className="min-h-screen bg-slate-50 flex overflow-hidden">
+            {/* Mobile Sidebar Overlay */}
+            {isMobileMenuOpen && (
+                <div
+                    className="fixed inset-0 bg-slate-900/50 z-40 md:hidden backdrop-blur-sm"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+            )}
+
             {/* Sidebar Navigation */}
             <motion.aside
                 initial={{ x: -250 }}
                 animate={{ x: 0 }}
-                className="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col"
+                className={`fixed md:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
             >
                 <div className="h-20 flex items-center px-8 border-b border-slate-100">
                     <h2 className="text-2xl font-bold text-slate-800">
@@ -74,7 +85,10 @@ export default function Dashboard() {
                     {navItems.map((item) => (
                         <button
                             key={item.id}
-                            onClick={() => setActiveTab(item.id)}
+                            onClick={() => {
+                                setActiveTab(item.id);
+                                setIsMobileMenuOpen(false);
+                            }}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${activeTab === item.id
                                 ? 'bg-primary-50 text-primary-600 font-semibold shadow-sm'
                                 : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium'
@@ -112,6 +126,12 @@ export default function Dashboard() {
                         </div>
 
                         <div className="flex items-center gap-4">
+                            <button
+                                className="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition mr-2"
+                                onClick={() => setIsMobileMenuOpen(true)}
+                            >
+                                <Menu className="w-6 h-6" />
+                            </button>
                             {/* User Avatar / Header Actions */}
                             <button
                                 onClick={() => setActiveTab('profile')}
