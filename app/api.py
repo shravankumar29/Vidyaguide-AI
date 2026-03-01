@@ -184,7 +184,7 @@ async def register(user: UserCreate):
         )
     # Use Supabase Auth for registration
     try:
-        response = supabase.auth.signUp({
+        response = supabase.auth.sign_up({
             "email": user.email,
             "password": user.password,
             "options": {
@@ -221,7 +221,7 @@ async def login(user: UserLogin):
             token_type="bearer"
         )
     try:
-        response = supabase.auth.signInWithPassword({
+        response = supabase.auth.sign_in_with_password({
             "email": user.email,
             "password": user.password
         })
