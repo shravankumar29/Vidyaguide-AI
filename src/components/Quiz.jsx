@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { BookOpen, CheckCircle, HelpCircle, Loader2 } from 'lucide-react';
 import { api } from '../services/api';
-import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 export default function Quiz() {

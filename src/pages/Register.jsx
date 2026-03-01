@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { api, setAuthToken } from '../services/api';
+import { api } from '../services/api';
 import { Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
 
 export default function Register() {
@@ -18,7 +17,7 @@ export default function Register() {
         setError('');
 
         try {
-            const res = await api.post('/auth/register', { email, password, name });
+            await api.post('/auth/register', { email, password, name });
             // Seed the profile so the user sees their own info immediately when they do log in
             const defaultProfile = {
                 name: name || 'VidyaMitra User',

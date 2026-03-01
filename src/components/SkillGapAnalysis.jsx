@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Target, Search, BookOpen, AlertCircle, Loader2 } from 'lucide-react';
 import { api } from '../services/api';
-import { motion } from 'framer-motion';
-
 export default function SkillGapAnalysis() {
     const [currentSkills, setCurrentSkills] = useState('');
     const [targetRole, setTargetRole] = useState('');

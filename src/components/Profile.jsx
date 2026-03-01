@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { User, Mail, Shield, Key, Camera, LogOut } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { setAuthToken } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,25 +14,23 @@ export default function Profile() {
     const [passwordSuccess, setPasswordSuccess] = useState('');
 
     // Using placeholder data since we don't have a GET /me endpoint yet
-    const [profile, setProfile] = useState({
-        name: 'VidyaMitra User',
-        email: 'user@example.com',
-        role: 'Job Seeker',
-        phone: '+1 (555) 000-0000',
-        location: 'San Francisco, CA'
-    });
-
-    // Load profile from local storage on component mount
-    useEffect(() => {
+    const [profile, setProfile] = useState(() => {
         const savedProfile = localStorage.getItem('vidyamitra_user_profile');
         if (savedProfile) {
             try {
-                setProfile(JSON.parse(savedProfile));
+                return JSON.parse(savedProfile);
             } catch (e) {
                 console.error("Could not parse saved profile data", e);
             }
         }
-    }, []);
+        return {
+            name: 'VidyaMitra User',
+            email: 'user@example.com',
+            role: 'Job Seeker',
+            phone: '+1 (555) 000-0000',
+            location: 'San Francisco, CA'
+        };
+    });
 
     const handleSaveProfile = () => {
         if (isEditing) {

@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Map, Briefcase, Award, Clock, Loader2, ArrowDown } from 'lucide-react';
 import { api } from '../services/api';
-import { motion } from 'framer-motion';
-
 export default function CareerPath() {
     const [currentSkills, setCurrentSkills] = useState('');
     const [domain, setDomain] = useState('');

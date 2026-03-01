@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Video, Search, ExternalLink, Loader2 } from 'lucide-react';
 import { api } from '../services/api';
-import { motion } from 'framer-motion';
-
 export default function Training() {
     const [topic, setTopic] = useState('');
     const [loading, setLoading] = useState(false);
