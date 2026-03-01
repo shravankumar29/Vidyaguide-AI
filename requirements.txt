@@ -4,5 +4,5 @@ supabase
 google-generativeai
 python-dotenv
 python-multipart
-pydantic
+pydantic[email]
 pydantic-settings
